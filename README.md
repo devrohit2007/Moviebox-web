@@ -26,7 +26,7 @@ Run it on one machine (a PC, a Raspberry Pi, or even an old Android phone with T
 **Windows / macOS / Linux**
 
 ```bash
-git clone <your-repo-url> moviebox-web
+git clone https://github.com/devrohit2007/Moviebox-web moviebox-web
 cd moviebox-web
 python -m venv .venv
 # Windows:  .venv\Scripts\activate        macOS/Linux:  source .venv/bin/activate
