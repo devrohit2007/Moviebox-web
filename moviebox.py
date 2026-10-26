@@ -1,7 +1,8 @@
-"""Python port of the MovieBox provider from mesamirh/MovieBox-Tui (MIT OR Apache-2.0).
+"""MovieBox provider client (Python).
 
-Ported: request signing, visitor session, host failover, search, homepage,
-details, seasons, stream resolution (direct + DASH), subtitles.
+Implements request signing, visitor session, host failover, search, homepage,
+details, seasons, stream resolution (direct + DASH) and subtitles.
+See THIRD_PARTY_NOTICES.md for licensing of the original work this is based on.
 """
 import base64
 import hashlib
