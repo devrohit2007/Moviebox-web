@@ -37,7 +37,7 @@ pip install -r requirements.txt
 
 ```bash
 pkg update -y && pkg install python git -y
-git clone <your-repo-url> moviebox-web
+git clone https://github.com/devrohit2007/Moviebox-web moviebox-web
 cd moviebox-web
 pip install -r requirements.txt
 termux-wake-lock        # keeps the server alive while the screen is off
