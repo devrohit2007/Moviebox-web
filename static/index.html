@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0e0f13">
+<meta name="theme-color" content="#0b0b0f">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="/manifest.json">
@@ -11,69 +11,202 @@
 <link rel="apple-touch-icon" href="/static/icon-192.png">
 <title>MovieBox Web</title>
 <style>
-:root{--bg:#0e0f13;--panel:#171922;--panel2:#20232f;--text:#eceef5;--mute:#9aa0b4;--accent:#ff4d5e;--r:12px;--card:130px}
-@media(min-width:700px){:root{--card:160px}}
-@media(min-width:1400px){:root{--card:210px;font-size:18px}}
+:root{
+  --bg:#0b0b0f;--bg2:#141419;--panel:#1b1b22;--panel2:#26262f;--text:#f4f4f6;--mute:#a4a4b2;
+  --red:#e50914;--red2:#b20710;--r:10px;--card:128px;--pad:4vw;--hero-h:72vh;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+@media(min-width:700px){:root{--card:168px;--pad:3.2vw;--hero-h:78vh}}
+@media(min-width:1400px){:root{--card:216px;--pad:3vw;font-size:19px}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+html{scroll-behavior:auto}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
 button,select,input{font:inherit;color:inherit}
-:focus-visible{outline:3px solid #fff;outline-offset:2px}
-header{position:sticky;top:0;z-index:5;background:rgba(14,15,19,.94);backdrop-filter:blur(8px);padding:10px 14px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #1d2030}
-header h1{font-size:17px;margin:0;color:var(--accent);cursor:pointer;white-space:nowrap}
-#q{flex:1;min-width:0;background:var(--panel);border:1px solid #262a3a;border-radius:99px;padding:9px 16px;outline:none}
-#q:focus{border-color:var(--accent)}
-.nav{background:var(--panel);border:0;border-radius:99px;padding:8px 14px;cursor:pointer;white-space:nowrap}
-.nav.on{background:var(--accent)}
-main{padding:14px;max-width:1500px;margin:0 auto}
-.sec{margin:18px 0 10px;color:var(--text);font-size:16px;font-weight:600}
-.sec small{color:var(--mute);font-weight:400;margin-left:6px}
-.rowh{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 2px 10px;scrollbar-width:none}
-.rowh::-webkit-scrollbar{display:none}
-.rowh .card{flex:0 0 var(--card);scroll-snap-align:start}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card),1fr));gap:14px}
-.card{cursor:pointer;background:var(--panel);border-radius:var(--r);overflow:hidden;position:relative}
-.card img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:var(--panel2)}
-.card .t{padding:8px 9px 10px;font-size:13px}
-.card .t b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.card .t span{color:var(--mute);font-size:12px}
-.badge{position:absolute;top:7px;left:7px;background:rgba(0,0,0,.7);border-radius:6px;padding:2px 7px;font-size:11px}
-.rate{position:absolute;top:7px;right:7px;background:rgba(0,0,0,.7);border-radius:6px;padding:2px 7px;font-size:11px;color:#ffd166}
-.prog{position:absolute;left:0;right:0;bottom:46px;height:4px;background:rgba(255,255,255,.25)}
-.prog i{display:block;height:100%;background:var(--accent)}
-.card .x{position:absolute;right:6px;bottom:50px;background:rgba(0,0,0,.7);border:0;border-radius:50%;width:26px;height:26px;cursor:pointer;line-height:1}
-.msg{padding:40px 10px;text-align:center;color:var(--mute)}
-.btn{background:var(--accent);border:0;border-radius:99px;padding:10px 22px;font-weight:600;cursor:pointer}
-.btn.alt{background:var(--panel2)}
-.btn.sm{padding:7px 13px;font-weight:500}
+button{cursor:pointer}
+:focus{outline:none}
+:focus-visible{outline:3px solid #fff;outline-offset:3px}
+img{display:block}
+
+/* ---------- header ---------- */
+header{position:fixed;inset:0 0 auto 0;z-index:30;display:flex;align-items:center;gap:14px;padding:12px var(--pad);
+  background:linear-gradient(180deg,rgba(11,11,15,.92),rgba(11,11,15,0));transition:background .25s}
+header.solid{background:rgba(11,11,15,.97);box-shadow:0 2px 14px rgba(0,0,0,.5)}
+.logo{font-weight:900;font-size:21px;letter-spacing:.06em;color:var(--red);cursor:pointer;text-transform:uppercase;white-space:nowrap;text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.nav{display:flex;gap:4px}
+.nav a{padding:7px 12px;border-radius:99px;color:#e6e6ea;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.nav a.on{background:rgba(255,255,255,.14)}
+.sp{flex:1}
+#q{width:min(320px,48vw);min-width:0;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.28);border-radius:6px;padding:8px 14px;outline:none;transition:border-color .2s,width .25s}
+#q:focus{border-color:#fff;width:min(420px,60vw)}
+@media(max-width:600px){.nav a.t{display:none}#q{flex:1;width:auto}#q:focus{width:auto}.sp{display:none}}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:6px;padding:10px 24px;font-weight:700;font-size:1rem;
+  background:#fff;color:#000;transition:transform .15s var(--ease),background .2s}
+.btn:hover{background:rgba(255,255,255,.82)}
+.btn:active{transform:scale(.97)}
+.btn.red{background:var(--red);color:#fff}.btn.red:hover{background:var(--red2)}
+.btn.ghost{background:rgba(109,109,122,.7);color:#fff}.btn.ghost:hover{background:rgba(109,109,122,.5)}
+.btn.sm{padding:7px 14px;font-size:.88rem;font-weight:600}
+
+/* ---------- hero ---------- */
+.hero{position:relative;height:var(--hero-h);min-height:420px;max-height:880px;overflow:hidden;background:var(--bg2)}
+.hero .layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;opacity:0;transition:opacity .9s ease}
+.hero .layer.on{opacity:1}
+.hero.poster-only .layer{opacity:0;object-position:center 15%}
+.hero.poster-only .layer.on{opacity:.62}
+.hero::before{content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(77deg,rgba(11,11,15,.92) 0%,rgba(11,11,15,.55) 38%,rgba(11,11,15,0) 70%)}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:42%;z-index:1;
+  background:linear-gradient(180deg,rgba(11,11,15,0),var(--bg))}
+.hero-body{position:absolute;z-index:2;left:var(--pad);bottom:22%;width:min(560px,86vw)}
+.kicker{font-size:.8rem;font-weight:700;letter-spacing:.18em;color:#d8d8e0;text-transform:uppercase;margin-bottom:10px}
+.kicker b{color:var(--red)}
+.hero-title{margin:0 0 10px;font-size:clamp(30px,5.4vw,66px);line-height:1.02;font-weight:900;letter-spacing:-.02em;text-shadow:0 3px 24px rgba(0,0,0,.6)}
+.hero-meta{display:flex;gap:12px;align-items:center;color:#d8d8e0;font-weight:600;font-size:.95rem;margin-bottom:12px;flex-wrap:wrap}
+.hero-meta .rt{color:#46d369}
+.hero-desc{margin:0 0 20px;color:#e2e2e8;font-size:clamp(.9rem,1.5vw,1.12rem);text-shadow:0 1px 10px rgba(0,0,0,.7);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.dots{position:absolute;z-index:3;right:var(--pad);bottom:24%;display:flex;gap:7px}
+.dots i{width:22px;height:4px;border-radius:2px;background:rgba(255,255,255,.3);cursor:pointer;transition:background .3s,width .3s}
+.dots i.on{background:#fff;width:34px}
+@media(max-width:600px){.hero-body{bottom:20%}.dots{bottom:11%}.hero-desc{-webkit-line-clamp:2}}
+
+/* ---------- rows / cards ---------- */
+#rows{position:relative;z-index:3;margin-top:-9vh}
+.rowt{margin:0 var(--pad);padding:18px 0 4px;font-size:clamp(1rem,1.6vw,1.35rem);font-weight:700}
+.rowwrap{position:relative}
+.row{display:flex;gap:clamp(6px,.8vw,12px);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;padding:18px var(--pad) 26px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-padding-left:var(--pad)}
+.row::-webkit-scrollbar{display:none}
+.row .card{flex:0 0 var(--card);scroll-snap-align:start}
+.arrow{position:absolute;top:18px;bottom:26px;width:var(--pad);min-width:42px;border:0;background:rgba(11,11,15,.7);color:#fff;font-size:1.8rem;opacity:0;transition:opacity .2s;z-index:4;display:none}
+.arrow.l{left:0}.arrow.r{right:0}
+@media(hover:hover){.arrow{display:block}.rowwrap:hover .arrow{opacity:1}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card),1fr));gap:clamp(10px,1.4vw,20px);padding:18px var(--pad)}
+
+.card{position:relative;min-width:0;cursor:pointer;border-radius:var(--r);transition:transform .22s var(--ease),box-shadow .22s var(--ease);transform-origin:center}
+.ph{position:relative;aspect-ratio:2/3;border-radius:var(--r);overflow:hidden;background:var(--panel)}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s}
+.ph img.ld{opacity:1}
+.badge{position:absolute;top:7px;left:7px;z-index:2;background:rgba(0,0,0,.72);border-radius:4px;padding:2px 7px;font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.rate{position:absolute;top:7px;right:7px;z-index:2;background:rgba(0,0,0,.72);border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:700;color:#ffd166}
+.ov{position:absolute;inset:auto 0 0 0;z-index:2;padding:34px 10px 10px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.92));opacity:0;transition:opacity .2s}
+.ov b{display:block;font-size:.88rem;line-height:1.2;margin-bottom:3px}
+.ov span{font-size:.75rem;color:var(--mute)}
+.pl{position:absolute;z-index:2;left:50%;top:42%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(229,9,20,.92);
+  display:grid;place-items:center;opacity:0;transform:scale(.7);transition:opacity .2s,transform .2s var(--ease);font-size:18px;padding-left:3px}
+.cap{display:none;padding:7px 2px 0;min-width:0;overflow:hidden}
+.cap b{display:block;font-size:.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cap span{font-size:.72rem;color:var(--mute)}
+@media(hover:none){.cap{display:block}}
+@media(hover:hover){
+  .card:hover{transform:scale(1.07) translateY(-3px);z-index:6;box-shadow:0 14px 34px rgba(0,0,0,.65)}
+  .card:hover .ov,.card:hover .pl{opacity:1}.card:hover .pl{transform:scale(1)}
+}
+.card:focus-visible{transform:scale(1.07);z-index:6;outline-offset:2px;box-shadow:0 14px 34px rgba(0,0,0,.65)}
+.card:focus-visible .ov,.card:focus-visible .pl{opacity:1}.card:focus-visible .pl{transform:scale(1)}
+.prog{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.28);z-index:3}
+.prog i{display:block;height:100%;background:var(--red)}
+.card .x{position:absolute;right:6px;top:30px;z-index:4;background:rgba(0,0,0,.75);border:0;border-radius:50%;width:26px;height:26px;line-height:1;color:#fff}
+
+/* ---------- skeletons ---------- */
+@keyframes shim{from{background-position:200% 0}to{background-position:-200% 0}}
+.sk{background:linear-gradient(100deg,var(--panel) 30%,var(--panel2) 50%,var(--panel) 70%);background-size:200% 100%;animation:shim 1.3s linear infinite;border-radius:var(--r)}
+.sk-hero{height:var(--hero-h);min-height:420px;border-radius:0}
+.sk-row{display:flex;gap:12px;padding:6px var(--pad) 20px;overflow:hidden}
+.sk-row .sk{flex:0 0 var(--card);aspect-ratio:2/3}
+.sk-t{height:18px;width:180px;margin:20px var(--pad) 0}
+@media(prefers-reduced-motion:reduce){.sk{animation:none}*{transition-duration:.01ms!important}}
+
+/* ---------- misc ---------- */
+.sec{margin:0;padding:92px var(--pad) 0;font-size:clamp(1.1rem,2vw,1.6rem);font-weight:800}
+.sec small{color:var(--mute);font-weight:500;margin-left:8px;font-size:.6em}
+.msg{padding:90px var(--pad) 40px;text-align:center;color:var(--mute)}
+.more{height:60px;text-align:center;color:var(--mute);padding-top:18px}
+main{min-height:100vh;padding-bottom:60px}
 #detail{display:none}
-.hero{display:flex;gap:16px;flex-wrap:wrap}
-.hero img{width:150px;border-radius:var(--r);align-self:flex-start;background:var(--panel2)}
-.hero .info{flex:1;min-width:230px}
-.hero h2{margin:0 0 4px;font-size:22px}
-.meta{color:var(--mute);font-size:13px;margin-bottom:10px}
-.desc{color:#cfd3e2;margin:10px 0}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
-select{background:var(--panel2);border:1px solid #2b3043;border-radius:8px;padding:8px 10px}
-.eps{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px;margin-top:8px}
-.eps button{background:var(--panel2);border:1px solid #2b3043;border-radius:8px;padding:10px 0;cursor:pointer;position:relative}
+
+/* ---------- details ---------- */
+.dt{position:relative;overflow:hidden;padding:110px var(--pad) 30px;min-height:56vh}
+.dt-bg{position:absolute;inset:0;z-index:0}
+.dt-bg img{width:100%;height:100%;object-fit:cover;object-position:center 20%;opacity:.35}
+.dt-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,15,.55),var(--bg) 96%),linear-gradient(90deg,rgba(11,11,15,.9),rgba(11,11,15,.2))}
+.dt-in{position:relative;z-index:1;display:flex;gap:clamp(16px,3vw,40px);flex-wrap:wrap;align-items:flex-start}
+.dt-in>.ph{width:clamp(130px,22vw,300px);flex:0 0 auto;box-shadow:0 18px 50px rgba(0,0,0,.7)}
+.dt-info{flex:1;min-width:260px;max-width:820px}
+.dt-info h2{margin:0 0 8px;font-size:clamp(1.7rem,4vw,3.2rem);line-height:1.05;font-weight:900;letter-spacing:-.02em}
+.chips{display:flex;gap:10px;flex-wrap:wrap;color:#d8d8e0;font-weight:600;font-size:.92rem;margin-bottom:12px}
+.chips .rt{color:#46d369}
+.tag{color:var(--mute);font-style:italic;margin-bottom:8px}
+.desc{color:#dcdce4;margin:10px 0 14px;font-size:1.02rem}
+.cast{color:var(--mute);font-size:.88rem;margin-bottom:8px}
+.acts{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:16px}
+select{background:rgba(40,40,50,.95);border:1px solid #3a3a46;border-radius:6px;padding:9px 12px}
+.seasons{padding:8px var(--pad) 0}
+.seasons h3{margin:14px 0 8px;font-size:1.25rem}
+.eps{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:8px;margin-top:12px}
+.eps button{background:var(--panel);border:1px solid #2f2f3a;border-radius:6px;padding:11px 0;font-weight:600;position:relative;transition:background .15s,transform .15s}
 .eps button.seen{color:var(--mute)}
-.eps button.seen::after{content:"✓";position:absolute;top:1px;right:5px;font-size:10px;color:#4cd98a}
-.eps button:hover,.eps button.cur{background:var(--accent);border-color:var(--accent);color:#fff}
-#player{position:fixed;inset:0;background:#000;z-index:20;display:none;flex-direction:column}
-#player .bar{display:flex;gap:8px;align-items:center;padding:8px 10px;background:#0b0c10;flex-wrap:wrap}
-#player .bar .ttl{flex:1;min-width:120px;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eps button.seen::after{content:"✓";position:absolute;top:1px;right:5px;font-size:10px;color:#46d369}
+.eps button:hover,.eps button.cur{background:var(--red);border-color:var(--red);color:#fff}
+.eps button:hover{transform:translateY(-2px)}
+
+/* ---------- player ---------- */
+#player{position:fixed;inset:0;background:#000;z-index:60;display:none;flex-direction:column}
+#player .bar{display:flex;gap:8px;align-items:center;padding:8px 12px;background:linear-gradient(180deg,#000,#0b0b0f);flex-wrap:wrap}
+#player .bar .ttl{flex:1;min-width:120px;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #player video{flex:1;width:100%;min-height:0;background:#000}
-#pmsg{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;color:#ddd;pointer-events:none;padding:0 20px;text-shadow:0 1px 4px #000}
+#pmsg{white-space:pre-wrap;word-break:break-word;position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;color:#eee;pointer-events:none;padding:0 20px;text-shadow:0 1px 6px #000;font-size:1.05rem}
 video::cue{background:rgba(0,0,0,.65);font-size:1.15em}
 .ctl{justify-content:center}
-.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--mute)}
+.chk{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--mute)}
+.nav a .ic{display:none}
+@media(max-width:600px){.nav a.ico .lbl{display:none}.nav a.ico .ic{display:inline}.nav a{padding:6px 7px;font-size:13px}header{gap:8px}.logo{font-size:16px}#q{min-width:90px;padding:7px 10px}}
+
+/* ---------- provider picker (inside the player) ---------- */
+#pman{display:none;position:absolute;left:0;right:0;top:56px;bottom:56px;z-index:5;overflow:auto;background:rgba(0,0,0,.88);padding:18px var(--pad)}
+.pm-in{max-width:640px;margin:0 auto}
+.pm-in h3{margin:0 0 14px;font-size:1.1rem;font-weight:700}
+.pm-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.pm-row input{flex:1;min-width:140px;background:rgba(40,40,50,.95);border:1px solid #3a3a46;border-radius:6px;padding:9px 12px}
+#pmr{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+#pmr button{text-align:left;background:var(--panel);border:1px solid #2f2f3a;border-radius:6px;padding:10px 12px;color:var(--text)}
+#pmr button:hover{background:var(--red);border-color:var(--red)}
+#pmr small{color:var(--mute);margin-left:6px}
+
+/* ---------- live TV ---------- */
+.tvbar{display:flex;gap:10px;flex-wrap:wrap;padding:14px var(--pad) 0}
+.tvbar input{flex:1;min-width:160px;max-width:420px;background:rgba(40,40,50,.95);border:1px solid #3a3a46;border-radius:6px;padding:9px 12px}
+.tvgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;padding:18px var(--pad)}
+.ch{background:var(--panel);border-radius:var(--r);padding:12px 8px;text-align:center;cursor:pointer;min-width:0;transition:transform .2s var(--ease),background .2s}
+.ch:hover,.ch:focus-visible{transform:translateY(-3px);background:var(--panel2)}
+.ch .lg{height:54px;display:grid;place-items:center;margin-bottom:8px;font-size:1.6rem;font-weight:800;color:var(--mute)}
+.ch .lg img{max-width:100%;max-height:54px;object-fit:contain;margin:0 auto}
+.ch b{display:block;font-size:.82rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch span{font-size:.7rem;color:var(--mute)}
+
+/* ---------- settings ---------- */
+dialog#cfg{background:var(--bg2);color:var(--text);border:1px solid #33333f;border-radius:14px;padding:0;width:min(560px,94vw);max-height:90vh}
+dialog#cfg::backdrop{background:rgba(0,0,0,.7)}
+.cf{padding:20px;display:flex;flex-direction:column;gap:14px}
+.cf h3{margin:0;font-size:1.2rem}
+.cf label{display:block;font-weight:600;font-size:.9rem;margin-bottom:4px}
+.cf small{display:block;color:var(--mute);font-size:.78rem;margin-top:3px;font-weight:400}
+.cf textarea,.cf input[type=text]{width:100%;background:rgba(40,40,50,.95);border:1px solid #3a3a46;border-radius:6px;padding:9px 12px;font-size:.88rem}
+.cf .pl-row{display:flex;gap:10px;align-items:center;padding:6px 0}
+.cf .pl-row span{color:var(--mute);font-size:.78rem}
+.cf .bt{display:flex;gap:10px;justify-content:flex-end;align-items:center}
+#cfmsg{flex:1;color:#46d369;font-size:.85rem}
 </style>
 </head>
 <body>
-<header>
-  <h1 id="logo" tabindex="0">MovieBox</h1>
+<header id="hdr">
+  <div class="logo" id="logo" tabindex="0">MovieBox</div>
+  <nav class="nav"><a id="nHome" class="t on">Home</a><a id="navfav">My List</a><a id="nTv" class="ico" tabindex="0"><span class="lbl">Live TV</span><span class="ic">📺</span></a><a id="gear" tabindex="0" title="Sources &amp; settings">⚙</a></nav>
+  <div class="sp"></div>
   <input id="q" type="search" placeholder="Search movies, shows, anime…" enterkeyhint="search" autocomplete="off">
-  <button class="nav" id="navfav">♥ My List</button>
 </header>
 
 <main>
@@ -83,23 +216,42 @@ video::cue{background:rgba(0,0,0,.65);font-size:1.15em}
 
 <div id="player">
   <div class="bar">
-    <button class="btn alt sm" id="pclose">← Back</button>
+    <button class="btn ghost sm" id="pclose">← Back</button>
     <div class="ttl" id="ptitle"></div>
     <select id="pstream" title="Source / quality"></select>
+    <button class="btn ghost sm" id="pprov" title="Try another provider">⇄ Provider</button>
     <select id="psub" title="Subtitles"><option value="-1">Subtitles: loading…</option></select>
-    <button class="btn alt sm" id="pnext" style="display:none">Next ▶</button>
+    <button class="btn ghost sm" id="pnext" style="display:none">Next ▶</button>
   </div>
   <video id="video" controls playsinline></video>
   <div id="pmsg"></div>
+  <div id="pman"><div class="pm-in">
+    <h3 id="pmh"></h3>
+    <div class="pm-row" id="pmsw"></div>
+    <div class="pm-row"><select id="pmp" title="Provider"></select><input id="pmq" type="search" placeholder="Title to search" autocomplete="off"><button class="btn red sm" id="pmgo">Search</button></div>
+    <div id="pmr"></div>
+    <button class="btn ghost sm" id="pmx">Close</button>
+  </div></div>
   <div class="bar ctl">
-    <button class="btn alt sm" data-seek="-10">⏪ 10</button>
-    <button class="btn alt sm" data-seek="10">10 ⏩</button>
-    <button class="btn alt sm" data-seek="85">Skip intro +85s</button>
+    <button class="btn ghost sm" data-seek="-10">⏪ 10</button>
+    <button class="btn ghost sm" data-seek="10">10 ⏩</button>
+    <button class="btn ghost sm" data-seek="85">Skip intro +85s</button>
     <select id="pspeed" title="Speed"><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option><option>2</option></select>
     <label class="chk"><input type="checkbox" id="pauto"> Auto-next</label>
-    <button class="btn alt sm" id="pfs">⛶</button>
+    <button class="btn ghost sm" id="pfs">⛶</button>
   </div>
 </div>
+
+<dialog id="cfg"><div class="cf">
+  <h3>Sources &amp; settings</h3>
+  <div><label>Providers <small>Turn off the ones you don't want used.</small></label><div id="cfprov"></div></div>
+  <div><label for="cfpref">Play from first</label><select id="cfpref"></select></div>
+  <div><label for="cfmiss">If that provider does not have the title</label><select id="cfmiss"><option value="ask">Ask me which provider to switch to</option><option value="auto">Try the other providers automatically</option></select><small>If a source is found but will not play, the app always switches by itself.</small></div>
+  <div><label for="cfadd">Stremio addons (optional)</label><textarea id="cfadd" rows="3" placeholder="https://…/manifest.json — one per line"></textarea><small>Addons that serve direct links. Torrent-only addons can't play in a browser.</small></div>
+  <div><label for="cftv">Live TV playlists (optional)</label><textarea id="cftv" rows="3" placeholder="https://…/playlist.m3u — one per line"></textarea><small>Opens under “Live TV”.</small></div>
+  <div><label for="cf4k">4KHDHub address (only if the site moves)</label><input type="text" id="cf4k" placeholder="https://4khdhub.one/"></div>
+  <div class="bt"><span id="cfmsg"></span><button class="btn ghost sm" id="cfx">Close</button><button class="btn red sm" id="cfsave">Save</button></div>
+</div></dialog>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -111,12 +263,21 @@ const ls = {
 async function api(path){
   const r = await fetch(path);
   const j = await r.json().catch(() => ({}));
-  if(!r.ok) throw new Error(j.error || ('HTTP ' + r.status));
+  if(!r.ok){ const e = new Error(j.error || ('HTTP ' + r.status)); e.diag = j.diag; throw e; }
   return j;
 }
 const loadScript = (() => { const done = {}; return src => done[src] ||= new Promise((ok, no) => {
   const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error('Could not load ' + src)); document.head.appendChild(s); }); })();
 const fmtT = t => { t = Math.max(0, t | 0); const h = t / 3600 | 0, m = (t % 3600) / 60 | 0, s = t % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s).padStart(2, '0'); };
+
+/* ---------- image sizing: ask the server for thumbnails sized to this screen ---------- */
+const VW = window.innerWidth;
+const PW = VW >= 1400 ? 480 : 320;                 // poster thumbnail width
+const HW = VW >= 1400 ? 1920 : VW >= 700 ? 1280 : 780;  // hero / backdrop width
+const im = (u, w) => !u ? '' : u.startsWith('/img?') ? u + '&w=' + w : u;
+// fade images in once decoded (one capture listener instead of per-image handlers)
+document.addEventListener('load', e => { if(e.target.tagName === 'IMG') e.target.classList.add('ld'); }, true);
+document.addEventListener('error', e => { if(e.target.tagName === 'IMG' && e.target.closest('.ph')) e.target.style.display = 'none'; }, true);
 
 /* ---------- saved data (this device) ---------- */
 const favs = () => ls.get('mb_fav', {});
@@ -125,87 +286,190 @@ const seen = () => ls.get('mb_seen', {});
 const isFav = id => !!favs()[id];
 function toggleFav(item){ const f = favs(); if(f[item.id]) delete f[item.id]; else f[item.id] = {id: item.id, title: item.title, poster: item.poster, type: item.type, year: item.year}; ls.set('mb_fav', f); }
 
-/* ---------- cards / lists ---------- */
+/* ---------- building blocks ---------- */
 function card(i, extra = {}){
   const pct = extra.pct ? `<div class="prog"><i style="width:${extra.pct}%"></i></div>` : '';
+  const sub = extra.sub || [i.year, i.rating ? '★ ' + i.rating : ''].filter(Boolean).join('  ·  ');
   return `<div class="card" tabindex="0" data-id="${esc(i.id)}" ${extra.go ? `data-go="${esc(extra.go)}"` : ''}>
-    <img loading="lazy" referrerpolicy="no-referrer" src="${esc(i.poster || '')}" alt="" onerror="this.style.visibility='hidden'">
-    <span class="badge">${extra.badge || (i.type === 'series' ? 'Series' : 'Movie')}</span>
-    ${i.rating ? `<span class="rate">★ ${esc(i.rating)}</span>` : ''}
-    ${pct}${extra.remove ? '<button class="x" data-rm="1" title="Remove">✕</button>' : ''}
-    <div class="t"><b>${esc(i.title)}</b><span>${esc(extra.sub || i.year)}</span></div></div>`;
+    <div class="ph">
+      <img loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${esc(im(i.poster, PW))}" alt="">
+      <span class="badge">${extra.badge || (i.type === 'series' ? 'Series' : 'Movie')}</span>
+      ${i.rating && !extra.pct ? `<span class="rate">★ ${esc(i.rating)}</span>` : ''}
+      <div class="ov"><b>${esc(i.title)}</b><span>${esc(sub)}</span></div>
+      <div class="pl">▶</div>${pct}
+      ${extra.remove ? '<button class="x" data-rm="1" title="Remove">✕</button>' : ''}
+    </div>
+    <div class="cap"><b>${esc(i.title)}</b><span>${esc(extra.sub || i.year)}</span></div></div>`;
 }
-const grid = items => items.length ? '<div class="grid">' + items.map(i => card(i)).join('') + '</div>' : '<div class="msg">Nothing here.</div>';
-const rowOf = (title, html) => `<div class="sec">${esc(title)}</div><div class="rowh">${html}</div>`;
+const rowHTML = (title, cards) => `<div class="rowt">${esc(title)}</div><div class="rowwrap">
+  <button class="arrow l" tabindex="-1" aria-label="Scroll left">‹</button><div class="row">${cards}</div><button class="arrow r" tabindex="-1" aria-label="Scroll right">›</button></div>`;
+const grid = items => items.length ? '<div class="grid">' + items.map(i => card(i)).join('') + '</div>' : '<div class="msg" style="padding-top:20px">Nothing here.</div>';
+const skRows = n => Array.from({length: n}, () => `<div class="sk sk-t"></div><div class="sk-row">${'<div class="sk"></div>'.repeat(8)}</div>`).join('');
+const skHome = () => `<div class="sk sk-hero"></div><div style="margin-top:-6vh">${skRows(3)}</div>`;
 
-function showView(which){ $('#list').style.display = which === 'list' ? '' : 'none'; $('#detail').style.display = which === 'detail' ? 'block' : 'none'; }
-function setNav(){ $('#navfav').classList.toggle('on', location.hash === '#/fav'); }
+function showView(which){ $('#list').style.display = which === 'list' ? '' : 'none'; $('#detail').style.display = which === 'detail' ? 'block' : 'none'; if(which !== 'list') stopHero(); }
+function setNav(){ const h = location.hash; $('#nTv').classList.toggle('on', h === '#/tv'); $('#navfav').classList.toggle('on', h === '#/fav'); $('#nHome').classList.toggle('on', h === '' || h === '#/' || h === '#'); }
+const hdr = $('#hdr');
+let _tick = false;
+addEventListener('scroll', () => { if(_tick) return; _tick = true; requestAnimationFrame(() => { hdr.classList.toggle('solid', scrollY > 40); _tick = false; }); }, {passive: true});
 
+/* ---------- hero ---------- */
+let H = {items: [], i: 0, timer: 0, layer: 0};
+function stopHero(){ clearInterval(H.timer); H.timer = 0; }
+function startHero(){
+  stopHero();
+  if(H.items.length < 2 || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  H.timer = setInterval(() => { if(!document.hidden && $('#player').style.display === 'none') setHero((H.i + 1) % H.items.length); }, 9000);
+}
+function heroHTML(){
+  return `<div class="hero" id="hero"><img class="layer" id="hl0" alt="" decoding="async" referrerpolicy="no-referrer"><img class="layer" id="hl1" alt="" decoding="async" referrerpolicy="no-referrer">
+    <div class="hero-body"><div class="kicker" id="hk"></div><h1 class="hero-title" id="ht"></h1><div class="hero-meta" id="hm"></div>
+    <p class="hero-desc" id="hd"></p><div class="hero-actions"><button class="btn" id="hp">▶ Play</button><button class="btn ghost" id="hi">ⓘ More Info</button></div></div>
+    <div class="dots" id="hdots"></div></div>`;
+}
+function setHero(i){
+  const it = H.items[i]; if(!it) return; H.i = i;
+  const hero = $('#hero'); if(!hero) return;
+  const src = it.backdrop || it.poster;
+  hero.classList.toggle('poster-only', !it.backdrop);
+  const next = H.layer ^ 1, a = $('#hl' + next), b = $('#hl' + H.layer);
+  a.onload = () => { a.classList.add('on'); if(b !== a) b.classList.remove('on'); };
+  a.src = im(src, HW); H.layer = next;
+  if(a.complete && a.naturalWidth){ a.classList.add('on'); b.classList.remove('on'); }
+  $('#hk').innerHTML = `<b>${it.type === 'series' ? 'SERIES' : 'FILM'}</b> &nbsp;·&nbsp; FEATURED`;
+  $('#ht').textContent = it.title;
+  $('#hm').innerHTML = [it.rating ? `<span class="rt">★ ${esc(it.rating)}</span>` : '', esc(it.year)].filter(Boolean).join('<span>•</span>');
+  const hd = $('#hd'); hd.textContent = it.description || '';
+  if(!it.description && !it._d){   // description missing on the home payload: fetch once (server-cached)
+    it._d = 1; api('/api/details?id=' + encodeURIComponent(it.id)).then(d => { it.description = d.description || ''; if(H.items[H.i] === it) $('#hd').textContent = it.description; }).catch(() => {});
+  }
+  $('#hdots').innerHTML = H.items.map((_, k) => `<i class="${k === i ? 'on' : ''}" data-k="${k}"></i>`).join('');
+  $('#hp').onclick = () => { location.hash = `#/d/${it.id}/r/${it.type === 'series' ? '1/1' : '0/0'}`; };
+  $('#hi').onclick = () => { location.hash = '#/d/' + it.id; };
+  // warm the next backdrop
+  const n = H.items[(i + 1) % H.items.length]; if(n && H.items.length > 1){ const p = new Image(); p.src = im(n.backdrop || n.poster, HW); }
+}
+document.addEventListener('click', e => { const d = e.target.closest('#hdots i'); if(d){ setHero(+d.dataset.k); startHero(); } });
+
+/* ---------- home ---------- */
+let rowObs = null;
 async function showHome(){
   showView('list'); setNav();
   const h = hist(), cont = Object.values(h).sort((a, b) => b.ts - a.ts);
-  let top = '';
-  if(cont.length) top = rowOf('Continue watching', cont.map(c => card(c, {
+  const contHTML = cont.length ? rowHTML('Continue watching', cont.map(c => card(c, {
     pct: c.dur ? Math.min(100, c.t / c.dur * 100) : 0, remove: true,
-    badge: c.type === 'series' ? `S${c.se} E${c.ep}` : 'Resume', sub: fmtT(c.t) + ' watched', go: `${c.se}/${c.ep}`})).join(''));
-  $('#list').innerHTML = top + '<div class="msg">Loading…</div>';
-  try{
-    const r = await api('/api/home');
-    const secs = (r.sections && r.sections.length) ? r.sections : [{title: 'Trending', items: r.items}];
-    $('#list').innerHTML = top + secs.map(s => rowOf(s.title, s.items.map(i => card(i)).join(''))).join('');
-  }catch(e){ $('#list').innerHTML = top + `<div class="msg">${esc(e.message)}<br><br><button class="btn" onclick="route()">Retry</button></div>`; }
+    badge: c.type === 'series' ? `S${c.se} E${c.ep}` : 'Resume', sub: fmtT(c.t) + ' watched', go: `${c.se}/${c.ep}`})).join('')) : '';
+  $('#list').innerHTML = skHome();
+  let r;
+  try{ r = await api('/api/home?lite=1'); }
+  catch(e){ $('#list').innerHTML = `<div class="msg">${esc(e.message)}<br><br><button class="btn red" onclick="route()">Retry</button></div>`; return; }
+  if(location.hash && location.hash !== '#/' && location.hash !== '#') return;   // user already navigated away
+  const secs = (r.sections && r.sections.length) ? r.sections : [{title: 'Trending', items: r.items || []}];
+  const feat = secs.find(s => s.featured);
+  H.items = (feat ? feat.items : secs[0].items).slice(0, 6);
+  const rest = secs.filter(s => s !== feat && s.items.length);
+  $('#list').innerHTML = (H.items.length ? heroHTML() : '<div style="height:140px"></div>') + '<div id="rows"></div>';
+  if(H.items.length){ H.layer = 0; setHero(0); startHero(); }
+  // render rows progressively: 3 now, more as the user scrolls (keeps the DOM small on weak devices)
+  const box = $('#rows'); box.insertAdjacentHTML('beforeend', contHTML);
+  let n = 0; const step = 3;
+  const more = () => {
+    rest.slice(n, n + step).forEach(s => box.insertAdjacentHTML('beforeend', rowHTML(s.title, s.items.map(i => card(i)).join(''))));
+    n += step; if(n >= rest.length && rowObs){ rowObs.disconnect(); sentinel.remove(); }
+  };
+  const sentinel = document.createElement('div'); sentinel.style.height = '1px'; $('#list').appendChild(sentinel);
+  more();
+  if('IntersectionObserver' in window && rest.length > step){
+    rowObs && rowObs.disconnect();
+    rowObs = new IntersectionObserver(es => { if(es.some(e => e.isIntersecting)) more(); }, {rootMargin: '900px'});
+    rowObs.observe(sentinel);
+  }else{ while(n < rest.length) more(); }
 }
 async function showSearch(q){
   showView('list'); setNav(); $('#q').value = q;
-  $('#list').innerHTML = '<div class="msg">Loading…</div>';
-  try{ const {items} = await api('/api/search?q=' + encodeURIComponent(q)); $('#list').innerHTML = `<div class="sec">Results for “${esc(q)}”</div>` + grid(items); }
-  catch(e){ $('#list').innerHTML = `<div class="msg">${esc(e.message)}<br><br><button class="btn" onclick="route()">Retry</button></div>`; }
+  $('#list').innerHTML = `<h2 class="sec">Results for “${esc(q)}”</h2><div class="sk-row" style="padding-top:20px">${'<div class="sk"></div>'.repeat(8)}</div>`;
+  let page = 1, done = false, busy = false;
+  try{
+    const {items} = await api('/api/search?q=' + encodeURIComponent(q));
+    $('#list').innerHTML = `<h2 class="sec">Results for “${esc(q)}”</h2>` + grid(items) + '<div class="more" id="more"></div>';
+    done = items.length < 12;
+    const seenIds = new Set(items.map(i => i.id));
+    const sentinel = $('#more');
+    const loadMore = async () => {   // pagination: next page when the user reaches the bottom
+      if(busy || done) return; busy = true; sentinel.textContent = 'Loading…';
+      try{
+        const r = await api(`/api/search?q=${encodeURIComponent(q)}&page=${++page}`);
+        const fresh = r.items.filter(i => !seenIds.has(i.id)); fresh.forEach(i => seenIds.add(i.id));
+        if(fresh.length) $('#list .grid').insertAdjacentHTML('beforeend', fresh.map(i => card(i)).join(''));
+        if(!fresh.length || page >= 8) done = true;
+      }catch(_){ done = true; }
+      sentinel.textContent = ''; busy = false;
+    };
+    if('IntersectionObserver' in window){
+      const io = new IntersectionObserver(es => { if(es.some(e => e.isIntersecting)){ loadMore().then(() => { if(done) io.disconnect(); }); } }, {rootMargin: '600px'});
+      io.observe(sentinel);
+    }
+  }catch(e){ $('#list').innerHTML = `<div class="msg">${esc(e.message)}<br><br><button class="btn red" onclick="route()">Retry</button></div>`; }
 }
 function showFav(){
   showView('list'); setNav();
   const items = Object.values(favs());
-  $('#list').innerHTML = '<div class="sec">My List</div>' + (items.length ? grid(items) : '<div class="msg">Nothing saved yet. Open a title and tap ♥ Add to My List.</div>');
+  $('#list').innerHTML = '<h2 class="sec">My List</h2>' + (items.length ? grid(items) : '<div class="msg" style="padding-top:20px">Nothing saved yet. Open a title and tap “+ My List”.</div>');
 }
 $('#list').addEventListener('click', e => {
+  const ar = e.target.closest('.arrow');
+  if(ar){ const row = ar.parentElement.querySelector('.row'); row.scrollBy({left: (ar.classList.contains('l') ? -1 : 1) * row.clientWidth * .85, behavior: 'smooth'}); return; }
   const c = e.target.closest('.card'); if(!c) return;
   if(e.target.closest('[data-rm]')){ const h = hist(); delete h[c.dataset.id]; ls.set('mb_hist', h); route(); return; }
   location.hash = '#/d/' + c.dataset.id + (c.dataset.go ? '/r/' + c.dataset.go : '');
 });
 $('#list').addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.classList.contains('card')) e.target.click(); });
+// warm the details cache while a pointer hovers a poster (desktop / TV remote focus)
+let _pf = 0; const _pfd = new Set();
+$('#list').addEventListener('pointerover', e => {
+  const c = e.target.closest('.card'); if(!c || e.pointerType === 'touch') return;
+  clearTimeout(_pf); _pf = setTimeout(() => { const id = c.dataset.id; if(!_pfd.has(id) && _pfd.size < 40){ _pfd.add(id); fetch('/api/details?id=' + encodeURIComponent(id)).catch(() => {}); } }, 220);
+});
 $('#q').addEventListener('keydown', e => { if(e.key === 'Enter'){ const v = e.target.value.trim(); if(v){ e.target.blur(); location.hash = '#/s/' + encodeURIComponent(v); } } });
-$('#logo').onclick = () => { $('#q').value = ''; location.hash = '#/'; };
+$('#logo').onclick = $('#nHome').onclick = () => { $('#q').value = ''; if(location.hash === '#/' || !location.hash) route(); else location.hash = '#/'; scrollTo(0, 0); };
 $('#logo').onkeydown = e => { if(e.key === 'Enter') $('#logo').click(); };
 $('#navfav').onclick = () => { location.hash = location.hash === '#/fav' ? '#/' : '#/fav'; };
+$('#nTv').onclick = () => { location.hash = location.hash === '#/tv' ? '#/' : '#/tv'; };
+$('#nTv').onkeydown = e => { if(e.key === 'Enter') $('#nTv').click(); };
 
 /* ---------- details ---------- */
 let D = null, curSubject = null, curSeason = 0;
 async function showDetail(id, resume){
-  showView('detail'); setNav();
-  $('#detail').innerHTML = '<div class="msg">Loading…</div>';
+  showView('detail'); setNav(); scrollTo(0, 0);
+  $('#detail').innerHTML = `<div class="dt"><div class="dt-in"><div class="sk" style="width:clamp(130px,22vw,300px);aspect-ratio:2/3"></div>
+    <div class="dt-info"><div class="sk" style="height:44px;width:70%"></div><div class="sk" style="height:18px;width:40%;margin:14px 0"></div><div class="sk" style="height:90px"></div></div></div></div>`;
   try{ D = await api('/api/details?id=' + encodeURIComponent(id)); }
-  catch(e){ $('#detail').innerHTML = `<div class="msg">${esc(e.message)}<br><br><button class="btn" onclick="history.back()">Back</button></div>`; return; }
+  catch(e){ $('#detail').innerHTML = `<div class="msg">${esc(e.message)}<br><br><button class="btn red" onclick="history.back()">Back</button></div>`; return; }
   curSubject = D.id;
-  const meta = [D.year, D.duration, D.rating ? '★ ' + D.rating : '', (D.genres || []).join(', ')].filter(Boolean).join(' · ');
-  const dubOpts = (D.dubs || []).filter(d => d.id && d.id !== D.id).length
-    ? `<select id="dub" title="Audio"><option value="${esc(D.id)}">Original audio</option>${D.dubs.filter(d => d.id && d.id !== D.id).map(d => `<option value="${esc(d.id)}">${esc(d.label)}</option>`).join('')}</select>` : '';
+  const meta = [D.year, D.duration, (D.genres || []).join(', ')].filter(Boolean);
+  const dubList = (D.dubs || []).filter(d => d.id && d.id !== D.id);
+  const dubOpts = dubList.length
+    ? `<select id="dub" title="Audio"><option value="${esc(D.id)}">Original audio</option>${dubList.map(d => `<option value="${esc(d.id)}">${esc(d.label)}</option>`).join('')}</select>` : '';
   const h = hist()[D.id];
   const resumeBtn = h ? `<button class="btn" id="resumeBtn">▶ Resume${D.type === 'series' ? ` S${h.se} E${h.ep}` : ''} · ${fmtT(h.t)}</button>` : '';
   $('#detail').innerHTML = `
-    <button class="btn alt" onclick="history.back()">← Back</button>
-    <div class="hero" style="margin-top:12px">
-      <img referrerpolicy="no-referrer" src="${esc(D.poster || '')}" alt="">
-      <div class="info">
-        <h2>${esc(D.title)}</h2>
-        <div class="meta">${esc(meta)}</div>
-        ${D.tagline ? `<div class="meta"><i>${esc(D.tagline)}</i></div>` : ''}
-        <div class="desc">${esc(D.description || '')}</div>
-        ${D.stars ? `<div class="meta">Cast: ${esc(D.stars)}</div>` : ''}
-        <div class="row">${resumeBtn}${D.type === 'movie' ? `<button class="btn ${h ? 'alt' : ''}" id="playMovie">${h ? '↺ Start over' : '▶ Play'}</button>` : ''}
-          <button class="btn alt" id="favBtn"></button>${dubOpts}</div>
+    <div class="dt">
+      <div class="dt-bg"><img decoding="async" referrerpolicy="no-referrer" src="${esc(im(D.poster, 780))}" alt=""></div>
+      <div class="dt-in">
+        <div class="ph"><img decoding="async" referrerpolicy="no-referrer" src="${esc(im(D.poster, PW))}" alt=""></div>
+        <div class="dt-info">
+          <h2>${esc(D.title)}</h2>
+          <div class="chips">${D.rating ? `<span class="rt">★ ${esc(D.rating)}</span>` : ''}${meta.map(m => `<span>${esc(m)}</span>`).join('')}</div>
+          ${D.tagline ? `<div class="tag">${esc(D.tagline)}</div>` : ''}
+          <div class="desc">${esc(D.description || '')}</div>
+          ${D.stars ? `<div class="cast">Cast: ${esc(D.stars)}</div>` : ''}${D.director ? `<div class="cast">Director: ${esc(D.director)}</div>` : ''}
+          <div class="acts">${resumeBtn}${D.type === 'movie' ? `<button class="btn ${h ? 'ghost' : ''}" id="playMovie">${h ? '↺ Start over' : '▶ Play'}</button>` : ''}
+            <button class="btn ghost" id="favBtn"></button>${dubOpts}<button class="btn ghost sm" onclick="history.back()">← Back</button></div>
+        </div>
       </div>
     </div>
-    ${D.type === 'series' ? '<div id="seriesBox"></div>' : ''}`;
-  const favLabel = () => $('#favBtn').textContent = isFav(D.id) ? '♥ In My List' : '♡ Add to My List';
+    ${D.type === 'series' ? '<div class="seasons" id="seriesBox"></div>' : ''}`;
+  const favLabel = () => $('#favBtn').textContent = isFav(D.id) ? '✓ In My List' : '+ My List';
   favLabel(); $('#favBtn').onclick = () => { toggleFav(D); favLabel(); };
   if($('#dub')) $('#dub').onchange = e => curSubject = e.target.value;
   if(h && $('#resumeBtn')) $('#resumeBtn').onclick = () => { if(h.subject) curSubject = h.subject; play(h.se, h.ep); };
@@ -214,13 +478,14 @@ async function showDetail(id, resume){
   if(resume){ const [se, ep] = resume.split('/').map(Number); if(h && h.subject) curSubject = h.subject; play(se, ep, true); }
 }
 function renderSeries(){
-  if(!D.seasons.length){ $('#seriesBox').innerHTML = '<div class="msg">No episode list available.</div>'; return; }
+  if(!D.seasons.length){ $('#seriesBox').innerHTML = '<div class="msg" style="padding:30px 0">No episode list available.</div>'; return; }
   if(!D.seasons.some(s => s.number === curSeason)) curSeason = D.seasons[0].number;
   const s = D.seasons.find(s => s.number === curSeason), done = new Set((seen()[D.id] || []));
   const cur = hist()[D.id];
   $('#seriesBox').innerHTML = `
-    <div class="row"><select id="seasonSel">${D.seasons.map(x => `<option value="${x.number}" ${x.number === curSeason ? 'selected' : ''}>Season ${x.number}</option>`).join('')}</select>
-    <span class="meta" style="margin:0">${s.episodes.length} episodes</span></div>
+    <h3>Episodes</h3>
+    <div class="acts" style="margin-top:0"><select id="seasonSel">${D.seasons.map(x => `<option value="${x.number}" ${x.number === curSeason ? 'selected' : ''}>Season ${x.number}</option>`).join('')}</select>
+    <span style="color:var(--mute)">${s.episodes.length} episodes</span></div>
     <div class="eps">${s.episodes.map(n => `<button data-ep="${n}" class="${done.has(curSeason + 'x' + n) ? 'seen' : ''} ${cur && cur.se === curSeason && cur.ep === n ? 'cur' : ''}">${n}</button>`).join('')}</div>`;
   $('#seasonSel').onchange = e => { curSeason = +e.target.value; renderSeries(); };
   $('#seriesBox .eps').onclick = e => { const b = e.target.closest('button'); if(b) play(curSeason, +b.dataset.ep); };
@@ -239,35 +504,89 @@ function destroyEngines(){
 }
 function pmsg(t){ $('#pmsg').textContent = t || ''; }
 const nextEp = () => {
-  if(!P || D.type !== 'series') return null;
+  if(!P || P.live || !D || D.type !== 'series') return null;
   const s = D.seasons.find(x => x.number === P.se); if(!s) return null;
   if(s.episodes.includes(P.ep + 1)) return [P.se, P.ep + 1];
   const nx = D.seasons.find(x => x.number > P.se && x.episodes.length);
   return nx ? [nx.number, nx.episodes[0]] : null;
 };
+/* ---------- providers: MovieBox first, then the fallbacks ---------- */
+let PROV = null, PCFG = {preferred: 'moviebox', on_missing: 'ask'};
+async function provList(){
+  if(!PROV){ try{ const r = await api('/api/providers'); PROV = r.providers; PCFG = {preferred: r.preferred, on_missing: r.on_missing}; }catch(_){ PROV = []; } }
+  return PROV;
+}
+const provName = id => id === 'moviebox' ? 'MovieBox' : (((PROV || []).find(p => p.id === id)) || {}).name || id;
+const cleanTitle = t => String(t || '').replace(/\s*\[[^\]]*\]/g, '').trim();
+
 async function play(se, ep, replace, fresh){
-  const my = ++playToken; clearTimeout(P && P.nextTimer);
+  const my = ++playToken; if(P){ clearTimeout(P.nextTimer); clearTimeout(P.wd); }
   const h = hist()[D.id];
-  P = {se, ep, subject: curSubject, streams: [], idx: 0, nextTimer: 0,
+  P = {se, ep, subject: curSubject, streams: [], idx: 0, nextTimer: 0, wd: 0, sid: 0, tries: 0, settled: true, playing: false,
+       live: false, ci: -1, chain: ['moviebox'], prov: 'moviebox', found: false, diag: '', missed: new Set(),
        pendingSeek: (!fresh && h && h.se === se && h.ep === ep && h.t > 10 && (!h.dur || h.t < h.dur * .95)) ? h.t : 0};
-  $('#player').style.display = 'flex';
+  stopHero();
+  $('#player').style.display = 'flex'; $('#pprov').style.display = ''; hideMan();
   $('#ptitle').textContent = D.title + (se || ep ? `  S${se} E${ep}` : '');
   $('#pnext').style.display = nextEp() ? '' : 'none';
   $('#pstream').innerHTML = ''; $('#psub').innerHTML = '<option value="-1">Subtitles: loading…</option>';
   destroyEngines(); pmsg('Finding streams…');
   if(replace) history.replaceState({player: 1}, ''); else history.pushState({player: 1}, '');
-  try{
-    const r = await api(`/api/streams?id=${encodeURIComponent(P.subject)}&se=${se}&ep=${ep}`);
+  const pl = await provList(); if(my !== playToken) return;
+  const ok = pl.filter(p => p.enabled && p.ready).map(p => p.id);
+  const first = ok.includes(PCFG.preferred) ? PCFG.preferred : ok[0];
+  P.chain = first ? [first, ...ok.filter(x => x !== first)] : ['moviebox'];   // your chosen provider goes first
+  nextProvider(my, '');
+}
+function streamsURL(pv){
+  const q = `se=${P.se}&ep=${P.ep}`;
+  return pv === 'moviebox' ? `/api/streams?id=${encodeURIComponent(P.subject)}&${q}`
+    : `/api/streams?p=${pv}&title=${encodeURIComponent(D.title)}&year=${encodeURIComponent(D.year || '')}&type=${D.type}&${q}`;
+}
+// walk the provider list until one returns streams. If the provider you chose has no such title, ask (or go on by itself, per settings)
+async function nextProvider(my, why){
+  const initial = !why;
+  while(++P.ci < P.chain.length){
+    const pv = P.chain[P.ci];
+    pmsg((why ? why + '\n' : '') + (P.ci === 0 ? 'Finding streams…' : `Trying ${provName(pv)}…`)); why = '';
+    let r = null;
+    try{ r = await api(streamsURL(pv)); }
+    catch(e){ if(my !== playToken) return; if(pv === 'moviebox') P.diag = e.diag || ''; }
     if(my !== playToken) return;
-    P.streams = r.streams;
-  }catch(e){ if(my === playToken) pmsg('Could not get streams: ' + e.message); return; }
-  $('#pstream').innerHTML = P.streams.map((s, i) => `<option value="${i}">${esc(s.label)}${s.size ? ' · ' + Math.max(1, Math.round(s.size / 1048576)) + ' MB' : ''}</option>`).join('');
+    if(r && r.streams && r.streams.length){ useStreams(my, pv, r.streams); return; }
+    P.missed.add(pv);
+    if(initial && P.ci === 0 && PCFG.on_missing === 'ask' && P.chain.length > 1){ showMan(`${provName(pv)} does not have this title. Switch to:`); return; }
+  }
+  showMan(P.found ? 'None of the sources could be played. Try another provider:' : 'This title was not found on any provider. Pick one and search:');
+}
+async function switchTo(pv){
+  const my = playToken; hideMan(); pmsg(`Trying ${provName(pv)}…`);
+  let r = null;
+  try{ r = await api(streamsURL(pv)); }catch(e){ if(pv === 'moviebox') P.diag = e.diag || ''; }
+  if(my !== playToken) return;
+  if(r && r.streams && r.streams.length) return useStreams(my, pv, r.streams);
+  P.missed.add(pv); showMan(`${provName(pv)} does not have it either. Pick another:`);
+}
+function useStreams(my, pv, streams){
+  P.prov = pv; P.streams = streams; P.found = true; P.tries = 0; hideMan();
+  $('#pstream').innerHTML = streams.map((s, i) => `<option value="${i}">${esc(s.label)}${s.size ? ' · ' + Math.max(1, Math.round(s.size / 1048576)) + ' MB' : ''}</option>`).join('');
   startStream(0, my);
-  loadSubs(my);
+  if(pv === 'moviebox') loadSubs(my); else $('#psub').innerHTML = '<option value="-1">No subtitles</option>';
+}
+// a source that will not start: next quality/source of this provider (3 tries), then the next provider
+function streamFailed(sid, why){
+  if(!P || P.sid !== sid || P.settled || P.playing) return;
+  P.settled = true; clearTimeout(P.wd);
+  if(P.live){ pmsg('This channel could not be played right now.'); return; }
+  const my = playToken; P.tries++;
+  if(P.tries < 3 && P.idx + 1 < P.streams.length){ pmsg(`That source failed (${why}). Trying the next one…`); startStream(P.idx + 1, my); }
+  else nextProvider(my, `${provName(P.prov)} could not play it (${why}).`);
 }
 async function startStream(i, my){
   if(i !== P.idx && video.currentTime > 3) P.pendingSeek = video.currentTime;
-  P.idx = i; const st = P.streams[i];
+  P.idx = i; const st = P.streams[i]; const sid = ++P.sid; P.settled = false; P.playing = false;
+  $('#pstream').value = i;
+  clearTimeout(P.wd); P.wd = setTimeout(() => streamFailed(sid, 'no response'), 40000);
   destroyEngines(); pmsg('Loading video…');
   try{
     if(st.kind === 'dash'){
@@ -275,28 +594,80 @@ async function startStream(i, my){
       if(my !== playToken) return;
       dashP = dashjs.MediaPlayer().create();
       dashP.initialize(video, st.src, true);
-      dashP.on('error', e => pmsg('Playback error: ' + (e.error && e.error.message || 'unknown')));
+      dashP.on('error', e => { if(P.playing) pmsg('Playback error: ' + (e.error && e.error.message || 'unknown')); else streamFailed(sid, 'stream error'); });
     }else if(st.kind === 'hls'){
       if(video.canPlayType('application/vnd.apple.mpegurl')) video.src = st.src;
       else{
         await loadScript('https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js');
         if(my !== playToken) return;
         hlsP = new Hls(); hlsP.loadSource(st.src); hlsP.attachMedia(video);
-        hlsP.on(Hls.Events.ERROR, (_, d) => d.fatal && pmsg('Playback error: ' + d.details));
+        hlsP.on(Hls.Events.ERROR, (_, d) => { if(!d.fatal) return; if(P.playing) pmsg('Playback error: ' + d.details); else streamFailed(sid, 'stream error'); });
       }
     }else{ video.src = st.src; }
     video.playbackRate = +$('#pspeed').value;
     await video.play().catch(() => {});
-  }catch(e){ pmsg('Could not start: ' + e.message); }
+  }catch(e){ streamFailed(sid, 'could not start'); }
 }
-video.addEventListener('loadedmetadata', () => { if(P && P.pendingSeek){ video.currentTime = P.pendingSeek; P.pendingSeek = 0; } video.playbackRate = +$('#pspeed').value; });
-video.addEventListener('playing', () => pmsg(''));
-video.addEventListener('error', () => { if(video.getAttribute('src')) pmsg('This source failed. Try another one from the list.'); });
-$('#pstream').onchange = e => startStream(+e.target.value, playToken);
+/* manual provider picker: shown when no provider has the title, or on request */
+function hideMan(){ $('#pman').style.display = 'none'; }
+function showMan(msg){
+  pmsg(''); clearTimeout(P && P.wd);
+  provList().then(pl => {
+    const opts = pl.filter(p => p.enabled && p.ready);
+    $('#pmh').textContent = opts.length ? msg : 'No other providers are turned on. Open ⚙ to enable some.';
+    const skip = new Set([...(P ? P.missed : [])].concat(P && P.found ? [P.prov] : []));
+    $('#pmsw').innerHTML = opts.filter(p => !skip.has(p.id)).map(p => `<button class="btn red sm" data-sw="${p.id}">Try ${esc(p.name)}</button>`).join('');
+    $('#pmp').innerHTML = opts.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+    $('#pmq').value = cleanTitle(D && D.title); $('#pmr').innerHTML = '';
+    $('#pman').style.display = 'block';
+    if(P && P.diag) $('#pmr').innerHTML = `<details><summary><small>Technical details</small></summary><small style="word-break:break-all">${esc(P.diag)}</small></details>`;
+  });
+}
+async function manSearch(){
+  const q = $('#pmq').value.trim(), p = $('#pmp').value; if(!q || !p) return;
+  $('#pmr').innerHTML = '<small>Searching…</small>';
+  try{
+    const r = await api(`/api/psearch?p=${p}&q=${encodeURIComponent(q)}`);
+    $('#pmr').innerHTML = r.items.length ? r.items.map(i => `<button data-p="${esc(p)}" data-pid="${esc(i.pid)}">${esc(i.title)}<small>${esc([i.year, i.type].filter(Boolean).join(' · '))}</small></button>`).join('') : '<small>Nothing found there. Try another spelling or provider.</small>';
+  }catch(e){ $('#pmr').innerHTML = `<small>${esc(e.message)}</small>`; }
+}
+async function manPick(p, pid){
+  const my = playToken; hideMan(); pmsg(`Loading from ${provName(p)}…`);
+  try{
+    if(p === 'moviebox') P.subject = pid;
+    const r = await api(p === 'moviebox' ? `/api/streams?id=${encodeURIComponent(pid)}&se=${P.se}&ep=${P.ep}` : `/api/streams?p=${p}&pid=${encodeURIComponent(pid)}&se=${P.se}&ep=${P.ep}`);
+    if(my !== playToken) return;
+    if(r.streams && r.streams.length) return useStreams(my, p, r.streams);
+  }catch(_){}
+  if(my === playToken) showMan(`No playable files there${P.se ? ` for S${P.se} E${P.ep}` : ''}. Pick another result or provider:`);
+}
+$('#pmgo').onclick = manSearch;
+$('#pmq').addEventListener('keydown', e => { if(e.key === 'Enter') manSearch(); });
+$('#pmr').addEventListener('click', e => { const b = e.target.closest('button[data-pid]'); if(b) manPick(b.dataset.p, b.dataset.pid); });
+$('#pmx').onclick = hideMan;
+$('#pmsw').addEventListener('click', e => { const b = e.target.closest('button[data-sw]'); if(b) switchTo(b.dataset.sw); });
+$('#pprov').onclick = () => { if(P && !P.live) showMan('Choose a provider and search:'); };
 
-/* progress / history */
+/* live TV */
+async function playLive(i, name){
+  const my = ++playToken; if(P){ clearTimeout(P.nextTimer); clearTimeout(P.wd); }
+  P = {live: true, streams: [], idx: 0, sid: 0, tries: 0, settled: true, playing: false, nextTimer: 0, wd: 0, pendingSeek: 0, chain: [], ci: 0, prov: 'tv'};
+  stopHero(); $('#player').style.display = 'flex'; hideMan(); $('#pprov').style.display = 'none';
+  $('#ptitle').textContent = name; $('#pnext').style.display = 'none';
+  $('#pstream').innerHTML = ''; $('#psub').innerHTML = '<option value="-1">No subtitles</option>';
+  destroyEngines(); pmsg('Tuning…'); history.pushState({player: 1}, '');
+  try{ const r = await api('/api/tv/play?i=' + i); if(my !== playToken) return; P.streams = r.streams; startStream(0, my); }
+  catch(e){ if(my === playToken) pmsg('Channel unavailable: ' + e.message); }
+}
+
+video.addEventListener('loadedmetadata', () => { if(P && P.pendingSeek){ video.currentTime = P.pendingSeek; P.pendingSeek = 0; } video.playbackRate = +$('#pspeed').value; });
+video.addEventListener('playing', () => { pmsg(''); if(P){ P.playing = true; P.tries = 0; clearTimeout(P.wd); } });
+video.addEventListener('loadeddata', () => { if(P) clearTimeout(P.wd); });
+video.addEventListener('error', () => { if(!video.getAttribute('src') || !P) return; if(P.playing) pmsg('Playback error. Try another source from the list.'); else streamFailed(P.sid, 'could not decode'); });
+$('#pstream').onchange = e => { P.tries = 0; startStream(+e.target.value, playToken); };
+
 function saveProgress(force){
-  if(!P || !D || !video.duration || !isFinite(video.duration) || video.currentTime < 3) return;
+  if(!P || P.live || !D || !video.duration || !isFinite(video.duration) || video.currentTime < 3) return;
   const now = Date.now(); if(!force && now - lastSave < 4000) return; lastSave = now;
   const h = hist(), done = video.currentTime / video.duration;
   if(done > .9 && D.type === 'series'){ const sn = seen(); const k = P.se + 'x' + P.ep; (sn[D.id] ||= []); if(!sn[D.id].includes(k)) sn[D.id].push(k); ls.set('mb_seen', sn); }
@@ -342,7 +713,6 @@ function setSub(i){ [...video.textTracks].forEach((t, k) => t.mode = (k === i ? 
 $('#psub').onchange = e => { const i = +e.target.value; setSub(i); ls.set('mb_sublang', i < 0 ? 'off' : e.target.selectedOptions[0].textContent); };
 $('#pnext').onclick = () => { const nx = nextEp(); if(nx){ saveProgress(true); play(nx[0], nx[1], true, true); } };
 
-/* controls */
 document.querySelectorAll('[data-seek]').forEach(b => b.onclick = () => { video.currentTime = Math.max(0, video.currentTime + +b.dataset.seek); });
 $('#pspeed').onchange = e => video.playbackRate = +e.target.value;
 const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
@@ -361,14 +731,14 @@ document.addEventListener('keydown', e => {
   else if(k === 'n'){ $('#pnext').click(); } else if(k === 's'){ video.currentTime += 85; }
   else if(k === 'Escape' && !fsEl()){ history.back(); }
 });
-function closePlayer(){ saveProgress(true); clearTimeout(P && P.nextTimer); playToken++; destroyEngines(); pmsg(''); $('#player').style.display = 'none'; if(fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document); if(D && D.type === 'series' && $('#seriesBox')) renderSeries(); else if(D && $('#detail').style.display === 'block') showDetail(D.id); }
+function closePlayer(){ saveProgress(true); if(P){ clearTimeout(P.nextTimer); clearTimeout(P.wd); } hideMan(); playToken++; destroyEngines(); pmsg(''); $('#player').style.display = 'none'; if(fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document); if(D && D.type === 'series' && $('#seriesBox')) renderSeries(); else if(D && $('#detail').style.display === 'block') showDetail(D.id); }
 $('#pclose').onclick = () => history.back();
 window.addEventListener('popstate', () => { if($('#player').style.display !== 'none') closePlayer(); else route(); });
 
 /* ---------- TV / keyboard navigation (arrow keys move focus) ---------- */
 document.addEventListener('keydown', e => {
   if($('#player').style.display !== 'none' || !/^Arrow/.test(e.key) || /INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
-  const els = [...document.querySelectorAll('.card, .eps button, main .btn, main select, #logo, #navfav')].filter(el => el.offsetParent);
+  const els = [...document.querySelectorAll('.card, .ch, .eps button, main .btn, #hero .btn, main select, #logo, #nHome, #navfav, #nTv, #gear')].filter(el => el.offsetParent);
   const cur = document.activeElement && els.includes(document.activeElement) ? document.activeElement : null;
   if(!cur){ if(els.length){ els[0].focus(); e.preventDefault(); } return; }
   const r = cur.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
@@ -377,12 +747,78 @@ document.addEventListener('keydown', e => {
     if(el === cur) continue;
     const b = el.getBoundingClientRect(), x = b.left + b.width / 2, y = b.top + b.height / 2, dx = x - cx, dy = y - cy;
     const ok = e.key === 'ArrowRight' ? dx > 5 && Math.abs(dy) < r.height : e.key === 'ArrowLeft' ? dx < -5 && Math.abs(dy) < r.height
-             : e.key === 'ArrowDown' ? dy > 5 && Math.abs(dx) < r.width * 1.5 : dy < -5 && Math.abs(dx) < r.width * 1.5;
+             : e.key === 'ArrowDown' ? dy > 5 && Math.abs(dx) < Math.max(r.width, 120) * 1.5 : dy < -5 && Math.abs(dx) < Math.max(r.width, 120) * 1.5;
     if(!ok) continue;
     const d = dx * dx + dy * dy; if(d < bd){ bd = d; best = el; }
   }
-  if(best){ best.focus(); best.scrollIntoView({block: 'nearest', inline: 'nearest'}); e.preventDefault(); }
+  if(best){ best.focus({preventScroll: true}); best.scrollIntoView({block: 'center', inline: 'nearest', behavior: 'smooth'}); e.preventDefault(); }
 });
+
+/* ---------- live TV ---------- */
+async function showTV(){
+  showView('list'); setNav();
+  $('#list').innerHTML = `<h2 class="sec">Live TV</h2><div class="tvbar"><input id="tvq" type="search" placeholder="Search channels" autocomplete="off"><select id="tvg"><option value="">All groups</option></select></div>
+    <div id="tvinfo"></div><div class="tvgrid" id="tvgrid"></div><div class="more" id="tvmore"></div>`;
+  let page = 1, busy = false, done = false, q = '', g = '', first = true, io = null;
+  const load = async reset => {
+    if(busy) return; busy = true;
+    if(reset){ page = 1; done = false; $('#tvgrid').innerHTML = ''; }
+    try{
+      const r = await api(`/api/tv/channels?q=${encodeURIComponent(q)}&group=${encodeURIComponent(g)}&page=${page}`);
+      if(first){
+        first = false;
+        $('#tvg').insertAdjacentHTML('beforeend', r.groups.map(x => `<option>${esc(x)}</option>`).join(''));
+        if(!r.configured) $('#tvinfo').innerHTML = '<div class="msg" style="padding:30px var(--pad)">No playlist yet.<br><br><button class="btn red" id="tvadd">Add a playlist</button></div>';
+        else if(r.errors.length && !r.total) $('#tvinfo').innerHTML = `<div class="msg" style="padding:30px var(--pad)">Could not load the playlist (${esc(r.errors.join(', '))}).</div>`;
+      }
+      $('#tvgrid').insertAdjacentHTML('beforeend', r.items.map(c => `<div class="ch" tabindex="0" data-i="${c.i}" data-n="${esc(c.name)}"><div class="lg">${c.logo ? `<img loading="lazy" referrerpolicy="no-referrer" src="${esc(im(c.logo, 160))}" alt="">` : esc((c.name || '?')[0])}</div><b>${esc(c.name)}</b><span>${esc(c.group)}</span></div>`).join(''));
+      done = !r.more; page++;
+    }catch(e){ $('#tvinfo').innerHTML = `<div class="msg">${esc(e.message)}</div>`; done = true; }
+    busy = false;
+  };
+  await load(true);
+  if('IntersectionObserver' in window){ io = new IntersectionObserver(es => { if(es.some(e => e.isIntersecting) && !done) load(false); }, {rootMargin: '600px'}); io.observe($('#tvmore')); }
+  let t = 0;
+  $('#tvq').oninput = e => { clearTimeout(t); t = setTimeout(() => { q = e.target.value.trim().toLowerCase(); load(true); }, 250); };
+  $('#tvg').onchange = e => { g = e.target.value; load(true); };
+}
+document.addEventListener('click', e => {
+  const c = e.target.closest('.ch'); if(c){ playLive(+c.dataset.i, c.dataset.n); return; }
+  if(e.target.id === 'tvadd') openCfg();
+});
+document.addEventListener('keydown', e => { if(e.key === 'Enter' && e.target.classList && e.target.classList.contains('ch')) e.target.click(); });
+
+/* ---------- settings ---------- */
+let CF = null;
+function renderCfg(c){
+  CF = c;
+  $('#cfprov').innerHTML = c.providers.map(p => `<div class="pl-row"><label style="margin:0;display:flex;gap:8px;align-items:center"><input type="checkbox" data-pv="${p.id}" ${p.enabled ? 'checked' : ''}> ${esc(p.name)}</label>${!p.ready ? `<span>— ${esc(p.note)}</span>` : ''}</div>`).join('');
+  $('#cfpref').innerHTML = c.providers.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  $('#cfpref').value = c.preferred; $('#cfmiss').value = c.on_missing;
+  $('#cfadd').value = c.addons.join('\n'); $('#cftv').value = c.tv_playlists.join('\n'); $('#cf4k').value = c.fourkhdhub_url || '';
+}
+async function openCfg(){
+  $('#cfmsg').textContent = ''; $('#cfg').showModal();
+  try{ renderCfg(await api('/api/config')); }catch(e){ $('#cfmsg').textContent = e.message; }
+}
+$('#gear').onclick = openCfg;
+$('#gear').onkeydown = e => { if(e.key === 'Enter') openCfg(); };
+$('#cfx').onclick = () => $('#cfg').close();
+$('#cfsave').onclick = async () => {
+  const lines = id => $(id).value.split('\n').map(s => s.trim()).filter(Boolean);
+  const en = {}; document.querySelectorAll('#cfprov [data-pv]').forEach(c => en[c.dataset.pv] = c.checked);
+  if(!Object.values(en).some(Boolean)){ $('#cfmsg').textContent = 'Keep at least one provider on.'; return; }
+  if(!en[$('#cfpref').value]){ $('#cfmsg').textContent = 'The provider you play from first must be turned on.'; return; }
+  const want = {addons: lines('#cfadd'), tv_playlists: lines('#cftv')};
+  try{
+    const r = await (await fetch('/api/config', {method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({enabled: en, preferred: $('#cfpref').value, on_missing: $('#cfmiss').value, ...want, fourkhdhub_url: $('#cf4k').value.trim()})})).json();
+    PROV = null; renderCfg(r);
+    const dropped = want.addons.length + want.tv_playlists.length - r.addons.length - r.tv_playlists.length;
+    $('#cfmsg').textContent = dropped > 0 ? `Saved. ${dropped} link(s) ignored (must be public http/https).` : 'Saved.';
+    if(location.hash === '#/tv') route();
+  }catch(e){ $('#cfmsg').textContent = 'Could not save: ' + e.message; }
+};
 
 /* ---------- routing ---------- */
 function route(){
@@ -390,9 +826,11 @@ function route(){
   if((m = h.match(/^#\/d\/([^/]+)(?:\/r\/(\d+\/\d+))?$/))) return showDetail(decodeURIComponent(m[1]), m[2]);
   if((m = h.match(/^#\/s\/(.+)$/))) return showSearch(decodeURIComponent(m[1]));
   if(h === '#/fav') return showFav();
+  if(h === '#/tv') return showTV();
   showHome();
 }
 window.addEventListener('hashchange', () => { if($('#player').style.display === 'none') route(); });
+document.addEventListener('visibilitychange', () => { if(!document.hidden && H.timer) startHero(); });
 route();
 </script>
 </body>

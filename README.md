@@ -14,7 +14,9 @@ Run it on one machine (a PC, a Raspberry Pi, or even an old Android phone with T
 - Continue watching, resume position, watched marks, My List
 - Auto-play next episode, ±10s and skip-intro buttons, playback speed, fullscreen, keyboard shortcuts
 - Installable to the home screen (PWA), arrow-key navigation for TVs and desktops
-- No database, no accounts, nothing to configure
+- Fallback sources: if MovieBox has nothing playable, or the video won't play, the app tries 4KHDHub, Dramachi and any Stremio addons you add, automatically. If no source has the title you can pick a provider and search by hand (⇄ Provider)
+- Live TV from your own M3U playlists
+- No database, no accounts (the optional ⚙ Sources box saves to `cache/config.json`)
 
 ## Requirements
 
@@ -84,7 +86,8 @@ Open the second one in any browser on your network. On a phone, use the browser 
 | Problem | Fix |
 | --- | --- |
 | "All hosts exhausted" | No internet on the host, or the service is temporarily down. Try again later. |
-| A title opens but won't play | Pick another source in the player's source list. |
+| A title opens but won't play | The app switches source by itself. You can also use the source list or ⇄ Provider in the player. |
+| 4KHDHub says it needs beautifulsoup4 | `pip install beautifulsoup4` |
 | Page loads but no pictures | Check the host's internet connection. |
 | Other devices can't open the link | Same Wi-Fi? Firewall? Correct IP printed by the server? |
 
@@ -93,6 +96,7 @@ Open the second one in any browser on your network. On a phone, use the browser 
 ```
 server.py            web server + media proxy
 moviebox.py          MovieBox API client and parsers
+providers.py         fallback sources (4KHDHub, Dramachi, addons) and Live TV playlists
 static/index.html    the whole front end
 ```
 

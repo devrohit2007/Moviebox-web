@@ -15,7 +15,11 @@ import threading
 import time
 from urllib.parse import parse_qsl, urlencode, urlparse
 
+import http.cookiejar
+from concurrent.futures import ThreadPoolExecutor
+
 import requests
+from requests.adapters import HTTPAdapter
 
 HOSTS = [
     "https://api6.aoneroom.com",
@@ -154,9 +158,41 @@ class ApiError(Exception):
     pass
 
 
+class _NoCookies(http.cookiejar.CookiePolicy):
+    """Never store cookies: sessions are only used for connection reuse."""
+    netscape = True
+    rfc2965 = hide_cookie2 = False
+
+    def set_ok(self, cookie, request):
+        return False
+
+    def return_ok(self, cookie, request):
+        return False
+
+    def domain_return_ok(self, domain, request):
+        return False
+
+    def path_return_ok(self, path, request):
+        return False
+
+
+def pooled_session(maxsize=64):
+    """requests.Session with a large keep-alive pool and no cookie jar."""
+    s = requests.Session()
+    s.cookies.set_policy(_NoCookies())
+    adapter = HTTPAdapter(pool_connections=16, pool_maxsize=maxsize, max_retries=0)
+    s.mount("http://", adapter)
+    s.mount("https://", adapter)
+    return s
+
+
+# shared worker pool for independent upstream calls (kept small for low-power devices)
+POOL = ThreadPoolExecutor(max_workers=8, thread_name_prefix="mb")
+
+
 class MovieBoxClient:
     def __init__(self):
-        self.http = requests.Session()
+        self.http = pooled_session(32)
         self.ua, self.client_info = gen_client_info()
         self.ip = spoofed_ip()
         self.host_idx = 0
@@ -241,7 +277,8 @@ class MovieBoxClient:
         except Exception:
             return
         token = data.get("token")
-        if token:
+        # only act on a *new* token: re-saving an unchanged session on every response = a disk write per API call
+        if token and not (self.session and self.session.get("token") == token):
             uid = data.get("uid") or data.get("userId")
             self._set_session(token, str(uid) if uid is not None else None)
 
@@ -396,20 +433,29 @@ def year_of(raw):
     return m.group(0) if m else ""
 
 
-def subject_to_item(s):
+def _img_url(v):
+    if isinstance(v, dict):
+        return v.get("url") or v.get("src")
+    return v if isinstance(v, str) else None
+
+
+def subject_to_item(s, banner_image=None):
     sid = _s(s.get("subjectId", s.get("id")))
     if not sid:
         return None
     stype = s.get("subjectType", s.get("stype", 1))
-    cover = s.get("cover")
-    poster = (cover.get("url") if isinstance(cover, dict) else None) or s.get("coverUrl") or s.get("poster") or s.get("pic")
+    poster = _img_url(s.get("cover")) or s.get("coverUrl") or s.get("poster") or s.get("pic")
+    backdrop = banner_image or _img_url(s.get("stills")) or _img_url(s.get("backdrop")) or _img_url(s.get("banner"))
+    desc = s.get("description") or s.get("intro") or ""
     return {
         "id": sid,
         "title": s.get("title") or s.get("name") or "Unknown",
         "type": "series" if stype == 2 else "movie",
         "year": year_of(str(s.get("releaseDate") or s.get("year") or s.get("releaseInfo") or "")),
         "poster": poster,
+        "backdrop": backdrop,
         "rating": s.get("imdbRatingValue"),
+        "description": (desc[:260] + "…") if len(desc) > 260 else desc,
     }
 
 
@@ -430,27 +476,32 @@ def search_to_items(payload):
 
 
 def homepage_to_sections(payload):
-    """Group homepage payload into titled rows: [{title, items}]."""
+    """Group homepage payload into titled rows: [{title, items, featured?}]."""
     groups = payload.get("items") if isinstance(payload, dict) else payload
     seen, sections = set(), []
-    for n, g in enumerate(groups or [], 1):
-        subs = []
-        for b in ((g.get("banner") or {}).get("banners") or []):
+    for g in groups or []:
+        entries = []  # (subject, banner_image)
+        banners = (g.get("banner") or {}).get("banners") or []
+        for b in banners:
             if b.get("subject"):
-                subs.append(b["subject"])
+                entries.append((b["subject"], _img_url(b.get("image")) or _img_url(b.get("cover"))))
         for c in ((g.get("customData") or {}).get("items") or []):
             if c.get("subject"):
-                subs.append(c["subject"])
-        subs.extend(g.get("subjects") or [])
+                entries.append((c["subject"], _img_url(c.get("image"))))
+        for sub in g.get("subjects") or []:
+            entries.append((sub, None))
         items = []
-        for s in subs:
-            it = subject_to_item(s)
+        for sub, img in entries:
+            it = subject_to_item(sub, img)
             if it and it["id"] not in seen:
                 seen.add(it["id"])
                 items.append(it)
         if items:
             title = g.get("title") or g.get("name") or g.get("opTitle") or ("Trending" if not sections else f"Picks {len(sections) + 1}")
-            sections.append({"title": str(title), "items": items})
+            sec = {"title": str(title), "items": items}
+            if banners:
+                sec["featured"] = True
+            sections.append(sec)
     return sections
 
 
@@ -674,9 +725,11 @@ def resource_item_to_release(item, ua):
 def get_releases(client: MovieBoxClient, subject_id, season=0, episode=0):
     """Return playable releases sorted best-first. Each has url + headers."""
     releases, seen = [], set()
+    # the two upstream lookups are independent: run them side by side
+    f_info = POOL.submit(client.play_info, subject_id, season, episode)
+    f_res = POOL.submit(client.episode_resources, subject_id, season, episode)
     try:
-        info = client.play_info(subject_id, season, episode)
-        for r in play_info_to_releases(info, season, episode, client.ua):
+        for r in play_info_to_releases(f_info.result(), season, episode, client.ua):
             releases.append(r)
             seen.add(r["url"].split("?")[0])
     except ApiError:
@@ -684,7 +737,7 @@ def get_releases(client: MovieBoxClient, subject_id, season=0, episode=0):
 
     items = []
     try:
-        payload = client.episode_resources(subject_id, season, episode)
+        payload = f_res.result()
         items = (payload.get("list") or []) if isinstance(payload, dict) else []
     except ApiError:
         if not releases:
@@ -727,8 +780,58 @@ def get_releases(client: MovieBoxClient, subject_id, season=0, episode=0):
         seen.add(base)
         releases.append(rel)
 
+    if not releases:
+        # play-info/resource only return a placeholder clip: fall back to the detector links on the subject details
+        releases = detector_releases(client, subject_id, season, episode)
+
     releases.sort(key=lambda r: (r["res"], r["size"] or 0), reverse=True)
     return releases
+
+
+def detector_releases(client, subject_id, season=0, episode=0):
+    try:
+        d = client.details(subject_id)
+    except ApiError:
+        return []
+    if not isinstance(d, dict):
+        return []
+    inner = d.get("subject") if isinstance(d.get("subject"), dict) else {}
+    dets = d.get("resourceDetectors") or inner.get("resourceDetectors") or []
+    out, seen = [], set()
+    for det in dets if isinstance(dets, list) else []:
+        if not isinstance(det, dict):
+            continue
+        for y in det.get("resolutionList") or []:
+            if not isinstance(y, dict):
+                continue
+            url = y.get("resourceLink") or y.get("url") or y.get("link") or ""
+            if not url.startswith(("http://", "https://")) or is_notice_url(url):
+                continue
+            se, ep = _int(y.get("se", det.get("se"))), _int(y.get("ep", det.get("ep")))
+            if (season or episode) and (se or ep) and (se != season or ep != episode):
+                continue
+            base = url.split("?")[0]
+            if base in seen:
+                continue
+            seen.add(base)
+            res = _int(y.get("resolution", y.get("res")))
+            codec = y.get("codecName") or y.get("codec")
+            title = clean_title(det.get("title") or inner.get("title") or "MovieBox")
+            out.append({
+                "filename": f"{title} {res}p {codec or ''}".strip(),
+                "quality": f"{res}p" if res else None,
+                "res": res or 0,
+                "codec": codec,
+                "size": _int(y.get("size")),
+                "season": season or None,
+                "episode": episode or None,
+                "resource_id": _s(y.get("resourceId", y.get("id"))),
+                "url": url,
+                "headers": {"User-Agent": client.ua},  # no Referer: the CDN answers 429 to it
+                "multi": False,
+                "label": f"{res}p {codec or ''}".strip() if res else "Direct",
+            })
+    return out
 
 
 # ---------------------------------------------------------------- subtitles
@@ -791,25 +894,29 @@ def get_captions(client: MovieBoxClient, subject_id, resource_id, sibling_ids=()
                 seen.add(o["url"])
                 all_caps.append(o)
 
-    try:
+    def primary():
         if subject_id and resource_id:
-            add(captions_to_options(client.ext_captions(subject_id, resource_id)))
-    except ApiError:
-        pass
+            return captions_to_options(client.ext_captions(subject_id, resource_id))
+        return []
 
-    for sib in [s for s in sibling_ids if s and s != subject_id][:3]:
+    def sibling(sib):
+        page = (episode - 1) // 20 + 1 if episode > 0 else 1
+        items = client.resource_page(sib, season, episode, page)
+        match = None
+        for it in items:
+            if (season == 0 and episode == 0) or (_int(it.get("se")) == season and _int(it.get("ep")) == episode):
+                match = it
+                break
+        rid = _s(match.get("resourceId", match.get("id"))) if match else None
+        return captions_to_options(client.ext_captions(sib, rid)) if rid else []
+
+    futures = [POOL.submit(primary)] + [
+        POOL.submit(sibling, s) for s in [s for s in sibling_ids if s and s != subject_id][:3]
+    ]
+    for f in futures:           # primary first, then siblings, same order as before
         try:
-            page = (episode - 1) // 20 + 1 if episode > 0 else 1
-            items = client.resource_page(sib, season, episode, page)
-            match = None
-            for it in items:
-                if (season == 0 and episode == 0) or (_int(it.get("se")) == season and _int(it.get("ep")) == episode):
-                    match = it
-                    break
-            rid = _s(match.get("resourceId", match.get("id"))) if match else None
-            if rid:
-                add(captions_to_options(client.ext_captions(sib, rid)))
-        except ApiError:
+            add(f.result(timeout=20))
+        except Exception:
             continue
 
     dedup, langs = [], set()
